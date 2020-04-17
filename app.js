@@ -1,51 +1,86 @@
-//Deine UI Vars
-
+// Define UI Vars
 const form = document.querySelector('#task-form');
 const taskList = document.querySelector('.collection');
-const clearbBtn = document.querySelector('.clear-task');
+const clearBtn = document.querySelector('.clear-tasks');
 const filter = document.querySelector('#filter');
 const taskInput = document.querySelector('#task');
 
-//Load all event listners
-loadEventListners();
+// Load all event listeners
+loadEventListeners();
 
-//Load all evnt listners
-function  loadEventListners(){
-    //Add task event
-    form.addEventListener('submit', addTask);
+// Load all event listeners
+function loadEventListeners() {
+  // Add task event
+  form.addEventListener('submit', addTask);
+  // Remove task event
+  taskList.addEventListener('click', removeTask);
+  // Clear task event
+  clearBtn.addEventListener('click', clearTasks);
+  // Filter tasks event
+  filter.addEventListener('keyup', filterTasks);
 }
 
-// Add task
-function addTask(e){
-    if(taskInput.value === ''){
-        alert('Add a task');
+// Add Task
+function addTask(e) {
+  if(taskInput.value === '') {
+    alert('Add a task');
+  }
+
+  // Create li element
+  const li = document.createElement('li');
+  // Add class
+  li.className = 'collection-item';
+  // Create text node and append to li
+  li.appendChild(document.createTextNode(taskInput.value));
+  // Create new link element
+  const link = document.createElement('a');
+  // Add class
+  link.className = 'delete-item secondary-content';
+  // Add icon html
+  link.innerHTML = '<i class="fa fa-remove"></i>';
+  // Append the link to li
+  li.appendChild(link);
+
+  // Append li to ul
+  taskList.appendChild(li);
+
+  // Clear input
+  taskInput.value = '';
+
+  e.preventDefault();
+}
+
+// Remove Task
+function removeTask(e) {
+  if(e.target.parentElement.classList.contains('delete-item')) {
+    if(confirm('Are You Sure?')) {
+      e.target.parentElement.parentElement.remove();
     }
-//Create li element
-const li = document.createElement('li');
-//Add class
-li.className = 'collection-item';
+  }
+}
 
-//Create text node and append to li
-li.appendChild(document.createTextNode(taskInput.value));
+// Clear Tasks
+function clearTasks() {
+  // taskList.innerHTML = '';
 
-//Cretae new Link element
-const Link = document.createTextNode('a');
+  // Faster
+  while(taskList.firstChild) {
+    taskList.removeChild(taskList.firstChild);
+  }
 
-//add class
-Link.className = 'delete-item secondary-content';
+  // https://jsperf.com/innerhtml-vs-removechild
+}
 
-//Add icon html
-Link.innerHTML = '<i class ="fa fa-remove"></a>';
+// Filter Tasks
+function filterTasks(e) {
+  const text = e.target.value.toLowerCase();
 
-//Append the Link to li
-li.appendChild (Link);
-
-//AQppend li to ul
-taskList.appendChild (li);
-
-//Clear input
-taskInput.value = '';
-
-
-e.preventDefault();
-} 
+  document.querySelectorAll('.collection-item').forEach(function(task){
+    const item = task.firstChild.textContent;
+    if(item.toLowerCase().indexOf(text) != -1){
+      task.style.display = 'block';
+    } else {
+      task.style.display = 'none';
+    }
+  });
+}
